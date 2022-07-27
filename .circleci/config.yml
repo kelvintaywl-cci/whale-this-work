@@ -20,7 +20,12 @@ commands:
     steps:
       - run: docker version
       - run: docker info
-      - run: (env | grep "DOCKER_") || true
+      - run:
+          name: check DOCKER_ env vars
+          command: |
+            # DOCKER_* env vars can be/are used to override some Docker config (e.g., for Docker + Remote Docker)
+            # See https://docs.docker.com/engine/reference/commandline/cli/#environment-variables
+            (env | grep "DOCKER_") || true
 
 jobs:
   explore-docker-daemon-machine:
