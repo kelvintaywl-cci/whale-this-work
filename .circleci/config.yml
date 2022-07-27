@@ -14,6 +14,12 @@ executors:
     docker:
       - image: cimg/base:stable
     resource_class: medium
+  kaniko-debug:
+    docker:
+      # we use the debug tag since it comes with sh
+      - image: gcr.io/kaniko-project/executor:debug
+        entrypoint: ""
+    resource_class: medium
 
 commands:
   check-docker:
@@ -127,6 +133,63 @@ jobs:
             echo $DOCKER_PASSWORD | docker login $DOCKER_REGISTRY --username $DOCKER_LOGIN --password-stdin
             docker image push --all-tags "${DOCKER_REGISTRY}/${DOCKER_USER}/<< parameters.image_name >>"
 
+  kaniko-build-push-machine:
+    environment:
+      <<: *environment
+    executor: ubuntu-2204
+    parameters:
+      image_name:
+        type: string
+        default: 'fancy-nginx'
+      image_tag:
+        type: string
+        default: 'latest'
+    steps:
+      - checkout
+      - run:
+          name: Build image via Kaniko
+          command: |
+            ./config.sh
+            ls -laH config.json
+
+            # Kaniko cache is a GCP Cloud Build feature (uses GCR).
+            # See https://cloud.google.com/build/docs/optimize-builds/kaniko-cache
+            # Hence, this is not applicable when pushing to Docker Hub
+            docker run \
+                -v /home/circleci/project/config.json:/kaniko/.docker/config.json:ro \
+                -v /home/circleci/project:/workspace \
+                gcr.io/kaniko-project/executor:latest \
+                --dockerfile /workspace/Dockerfile \
+                --destination "${DOCKER_REGISTRY}/${DOCKER_USER}/<< parameters.image_name >>:kaniko-machine-${CIRCLE_SHA1}" \
+                --context dir:///workspace/
+  # inspired by https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
+  kaniko-build-push-docker:
+    environment:
+      <<: *environment
+    executor: kaniko-debug
+    parameters:
+      image_name:
+        type: string
+        default: 'fancy-nginx'
+      image_tag:
+        type: string
+        default: 'latest'
+    steps:
+      - checkout
+      - run:
+          name: add Docker Hub credentials
+          command: |
+            mkdir -p /kaniko/.docker
+            ./config.sh
+            mv config.json /kaniko/.docker
+      - run:
+          name:
+          command: |
+            # See https://circleci.com/docs/env-vars#built-in-environment-variables
+            /kaniko/executor \
+                --context "$(pwd)" \
+                --dockerfile "$(pwd)/Dockerfile" \
+                --destination "${DOCKER_REGISTRY}/${DOCKER_USER}/<< parameters.image_name >>:kaniko-docker-${CIRCLE_SHA1}"
 workflows:
   explore-daemon:
     jobs:
@@ -139,7 +202,16 @@ workflows:
 
   docker-save-load:
     jobs:
-      - docker-build-save-image
+      - docker-build-save-image:
+          name: build-save-image
       - docker-load-push-image:
+          name: load-push-image
           requires:
-            - docker-build-save-image
+            - build-save-image
+
+  kaniko:
+    jobs:
+      - kaniko-build-push-machine:
+          name: machine-push
+      - kaniko-build-push-docker:
+          name: docker-push
