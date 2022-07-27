@@ -147,7 +147,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build image via Kaniko
+          name: Build and Push image via Kaniko
           command: |
             ./config.sh
             ls -laH config.json
@@ -183,7 +183,7 @@ jobs:
             ./config.sh
             mv config.json /kaniko/.docker
       - run:
-          name:
+          name: Build and Push image
           command: |
             # See https://circleci.com/docs/env-vars#built-in-environment-variables
             /kaniko/executor \
