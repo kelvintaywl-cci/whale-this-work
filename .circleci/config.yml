@@ -20,7 +20,7 @@ commands:
     steps:
       - run: docker version
       - run: docker info
-      - run: env | grep "DOCKER_"
+      - run: (env | grep "DOCKER_") || true
 
 jobs:
   explore-docker-daemon-machine:
@@ -28,11 +28,11 @@ jobs:
     steps:
       - check-docker
   explore-docker-daemon-docker:
-    executor: ubuntu-2204
+    executor: cimg-base
     steps:
       - check-docker
   explore-docker-daemon-docker-remote:
-    executor: ubuntu-2204
+    executor: cimg-base
     steps:
       - setup_remote_docker:
           version: 20.10.12
