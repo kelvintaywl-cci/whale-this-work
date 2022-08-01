@@ -191,6 +191,10 @@ jobs:
                 --dockerfile "$(pwd)/Dockerfile" \
                 --destination "${DOCKER_REGISTRY}/${DOCKER_USER}/<< parameters.image_name >>:kaniko-docker-${CIRCLE_SHA1}"
   kaniko-build-push-docker-ecr:
+    # NOTE: Kaniko image already comes with AWS ECR credential helper installed
+    # See https://github.com/GoogleContainerTools/kaniko#pushing-to-amazon-ecr
+    # What this means is that, we can just inject AWS credentials.
+    # In this example, we set credentials via AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY env vars
     environment:
       <<: *environment
       AWS_DEFAULT_REGION: ap-northeast-1
@@ -213,7 +217,8 @@ jobs:
       - run:
           name: Build and Push image
           command: |
-            # See https://circleci.com/docs/env-vars#built-in-environment-variables
+            # We pass in AWS credentials and configuration through the AWS_* env vars, via build-arg arguments.
+            # See https://github.com/GoogleContainerTools/kaniko/issues/713#issuecomment-557596725
             /kaniko/executor \
                 --context "$(pwd)" \
                 --dockerfile "$(pwd)/Dockerfile" \
@@ -232,20 +237,20 @@ workflows:
       - explore-docker-daemon-docker-remote:
           name: docker-and-remote-docker
 
-#   docker-save-load:
-#     jobs:
-#       - docker-build-save-image:
-#           name: build-save-image
-#       - docker-load-push-image:
-#           name: load-push-image
-#           requires:
-#             - build-save-image
+  docker-save-load:
+    jobs:
+      - docker-build-save-image:
+          name: build-save-image
+      - docker-load-push-image:
+          name: load-push-image
+          requires:
+            - build-save-image
 
   kaniko:
     jobs:
-#       - kaniko-build-push-machine:
-#           name: machine-push
-#       - kaniko-build-push-docker-hub:
-#           name: docker-push-docker-hub
+      - kaniko-build-push-machine:
+          name: machine-push
+      - kaniko-build-push-docker-hub:
+          name: docker-push-docker-hub
       - kaniko-build-push-docker-ecr:
           name: docker-push-aws-ecr
