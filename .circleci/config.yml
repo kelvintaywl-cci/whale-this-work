@@ -1,41 +1,8 @@
 version: 2.1
 
-defaults:
-  environment: &environment
-    DOCKER_REGISTRY: docker.io
-    DOCKER_USER: kelvintaywl
-
 orbs:
   docker: circleci/docker@2.1.3
   aws-ecr: circleci/aws-ecr@8.1.2
-
-executors:
-  ubuntu-2204:
-    machine:
-      image: ubuntu-2204:2022.04.1
-      resource_class: medium
-  cimg-base:
-    docker:
-      - image: cimg/base:stable
-    resource_class: medium
-  kaniko-debug:
-    docker:
-      # we use the debug tag since it comes with sh
-      - image: gcr.io/kaniko-project/executor:debug
-        entrypoint: ""
-    resource_class: medium
-
-commands:
-  check-docker:
-    steps:
-      - run: docker version
-      - run: docker info
-      - run:
-          name: check DOCKER_ env vars
-          command: |
-            # DOCKER_* env vars can be/are used to override some Docker config (e.g., for Docker + Remote Docker)
-            # See https://docs.docker.com/engine/reference/commandline/cli/#environment-variables
-            (env | grep "DOCKER_") || true
 
 jobs:
   publish:
