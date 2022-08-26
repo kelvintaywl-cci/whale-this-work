@@ -239,11 +239,11 @@ workflows:
           executor:
             name: docker/machine
             dlc: true
-          image: "${DOCKER_USER}/fancy-nginx"
+          image: "kelvintaywl/fancy-nginx"
           tag: "orb-${CIRCLE_SHA1}"
-          path: path/to/Docker/build/context
           registry: public.ecr.aws/z1j6a2i1
           before_build:
             - aws-ecr/ecr-login:
+                public-registry: true
                 registry-id: AWS_ECR_REGISTRY_ID
                 region: ap-northeast-1
