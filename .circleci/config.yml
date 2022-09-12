@@ -32,8 +32,8 @@ jobs:
     executor: ubuntu-2004-arm
     environment:
       <<: *environment
-      AWS_DEFAULT_REGION: ap-northeast-1
-      AWS_REGION: ap-northeast-1
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_REGION: us-east-1
     steps:
       - check-docker
       - aws-ecr/ecr-login
