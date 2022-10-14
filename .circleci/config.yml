@@ -14,12 +14,13 @@ executors:
     docker:
       - image: cimg/base:stable
     resource_class: medium
+  # uses container runner
   kaniko-debug:
     docker:
       # we use the debug tag since it comes with sh
       - image: gcr.io/kaniko-project/executor:debug
         entrypoint: ""
-    resource_class: medium
+    resource_class: kelvintaywl/cntr-agent-orange
 
 commands:
   check-docker:
