@@ -232,14 +232,14 @@ jobs:
                 --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
                 --destination "${AWS_ECR_REGISTRY}/${DOCKER_USER}/<< parameters.image_name >>:kaniko-docker-${CIRCLE_SHA1}"
 workflows:
-  explore-daemon:
-    jobs:
-      - explore-docker-daemon-machine:
-          name: machine
-      - explore-docker-daemon-docker:
-          name: docker
-      - explore-docker-daemon-docker-remote:
-          name: docker-and-remote-docker
+#   explore-daemon:
+#     jobs:
+#       - explore-docker-daemon-machine:
+#           name: machine
+#       - explore-docker-daemon-docker:
+#           name: docker
+#       - explore-docker-daemon-docker-remote:
+#           name: docker-and-remote-docker
 
   docker-save-load:
     jobs:
