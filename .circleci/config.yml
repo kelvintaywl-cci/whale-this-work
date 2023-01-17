@@ -17,9 +17,9 @@ jobs:
     parameters:
       exec:
         type: executor
-       remote-docker-version:
-         type: string
-         default: "19.03.8" 
+      remote-docker-version:
+        type: string
+        default: "19.03.8" 
     executor: << parameters.exec >>
     steps:
       - setup_remote_docker:
