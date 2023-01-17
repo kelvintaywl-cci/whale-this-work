@@ -6,20 +6,15 @@ executors:
     # https://app.circleci.com/pipelines/github/prometheus/influxdb_exporter/240/workflows/d8ee81c4-a505-445f-9635-4679bfd8ad6a/jobs/647
     docker:
       - image: circleci/golang:latest
-  pause:
-    # seen on failed (public) build
-    # https://app.circleci.com/pipelines/github/prometheus/influxdb_exporter/249/workflows/07ad23fd-52cf-4263-adfa-495310a0d44d/jobs/669
-    docker:
-      - image: public.ecr.aws/eks-distro/kubernetes/pause:3.6
 
 jobs:
   binfmt:
     parameters:
       exec:
         type: executor
+        default: golang
       remote-docker-version:
         type: string
-        default: "19.03.8" 
     executor: << parameters.exec >>
     steps:
       - setup_remote_docker:
@@ -34,6 +29,6 @@ workflows:
       - binfmt:
           matrix:
             parameters:
-              exec:
-                - golang
-                - pause
+              remote-docker-version:
+                - "19.03.8"
+                - "20.10.18"
