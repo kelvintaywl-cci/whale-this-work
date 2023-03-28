@@ -20,5 +20,9 @@ workflows:
           matrix:
             parameters:
               docker-version:
-                - 20.10.18
+                - 20.10.18  # control; latest based on our docs
+                - 20.10.19
+                - 20.10.20
+                - 20.10.21
+                - 20.10.22
                 - 20.10.23
