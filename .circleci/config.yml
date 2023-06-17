@@ -250,11 +250,11 @@ workflows:
           requires:
             - build-save-image
 
-  kaniko:
-    jobs:
-      - kaniko-build-push-machine:
-          name: machine-push
-      - kaniko-build-push-docker-hub:
-          name: docker-push-docker-hub
-      - kaniko-build-push-docker-ecr:
-          name: docker-push-aws-ecr
+#   kaniko:
+#     jobs:
+#       - kaniko-build-push-machine:
+#           name: machine-push
+#       - kaniko-build-push-docker-hub:
+#           name: docker-push-docker-hub
+#       - kaniko-build-push-docker-ecr:
+#           name: docker-push-aws-ecr
