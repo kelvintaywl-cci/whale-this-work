@@ -11,13 +11,15 @@ commands:
             # DOCKER_* env vars can be/are used to override some Docker config (e.g., for Docker + Remote Docker)
             # See https://docs.docker.com/engine/reference/commandline/cli/#environment-variables
             (env | grep "DOCKER_") || true
+      - run: docker image ls
+      - run: docker ps -a
 
 executors:
   ubuntu-2204-dlc:
     machine:
       image: ubuntu-2204:2022.10.2
       docker_layer_caching: true 
-    resource_class: medium
+    resource_class: large
 
 jobs:
   explore-docker-daemon-machine:
